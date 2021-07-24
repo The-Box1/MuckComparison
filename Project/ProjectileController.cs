@@ -28,6 +28,7 @@ public class ProjectileController : MonoBehaviour
 		GameObject gameObject = Object.Instantiate(inventoryItem.prefab, spawnPos, Quaternion.LookRotation(direction));
 		int attackDamage = inventoryItem.attackDamage;
 		float projectileSpeed = inventoryItem.bowComponent.projectileSpeed;
+		float colliderDisabledTime = inventoryItem.bowComponent.colliderDisabledTime;
 		gameObject.transform.rotation = Quaternion.LookRotation(direction);
 		Rigidbody component = gameObject.GetComponent<Rigidbody>();
 		if ((bool)component)
@@ -49,7 +50,7 @@ public class ProjectileController : MonoBehaviour
 			}
 		}
 		float multiplier = MobManager.Instance.mobs[mobObjectId].multiplier;
-		gameObject.GetComponent<EnemyProjectile>().DisableCollider(0.1f);
+		gameObject.GetComponent<EnemyProjectile>().DisableCollider(colliderDisabledTime);
 		gameObject.GetComponent<EnemyProjectile>().damage = (int)((float)attackDamage * multiplier);
 		MonoBehaviour.print("setting damage to: " + (float)attackDamage * multiplier);
 	}

@@ -94,6 +94,21 @@ public class ServerHandle
 		Server.clients[fromClient] = null;
 	}
 
+	public static void KickPlayer(int client)
+	{
+		ServerSend.DisconnectPlayer(client);
+		try
+		{
+			string msg = Server.clients[client].player.username + " kicked";
+			ServerSend.SendChatMessage(-1, "Server", msg);
+		}
+		catch
+		{
+			Debug.LogError("Failed to send disconnect message to clients");
+		}
+		Server.clients[client] = null;
+	}
+
 	public static void SpawnPlayersRequest(int fromClient, Packet packet)
 	{
 		Debug.Log("received request to spawn players");
@@ -125,6 +140,7 @@ public class ServerHandle
 			Vector3 gravePosition = GameManager.instance.GetGravePosition(fromClient);
 			ServerSend.SendChatMessage(-1, "", "<color=orange>" + Server.clients[fromClient].player.username + " has died.");
 			ServerSend.PlayerDied(fromClient, Server.clients[fromClient].player.pos, gravePosition, damageFromPlayer);
+			Server.clients[fromClient].player.stats["Deaths"]++;
 			if (GameManager.gameSettings.gameMode != GameSettings.GameMode.Versus)
 			{
 				GameManager.instance.CheckIfGameOver();
@@ -164,6 +180,7 @@ public class ServerHandle
 		{
 			AchievementManager.Instance.ReviveTeammate();
 		}
+		Server.clients[fromClient].player.stats["Revives"]++;
 	}
 
 	public static void PlayerPosition(int fromClient, Packet packet)
@@ -245,6 +262,7 @@ public class ServerHandle
 		if ((bool)component.powerup)
 		{
 			GameManager.instance.powerupsPickedup = true;
+			Server.clients[fromClient].player.stats["Powerups"]++;
 		}
 		ItemManager.Instance.PickupItem(num);
 		ServerSend.PickupItem(fromClient, num);
@@ -267,6 +285,10 @@ public class ServerHandle
 			componentInChildren.AllExecute();
 			componentInChildren.ServerExecute(fromClient);
 			ServerSend.PickupInteract(fromClient, num);
+			if (componentInChildren.GetType() == typeof(LootContainerInteract))
+			{
+				Server.clients[fromClient].player.stats["Chests"]++;
+			}
 		}
 	}
 
@@ -319,6 +341,7 @@ public class ServerHandle
 			{
 				ChestManager.Instance.UseChest(num, inUse: true);
 				ServerSend.OpenChest(fromClient, num, use: true);
+				ChestManager.Instance.chests[num].GetComponent<ChestInteract>().ServerExecute(fromClient);
 			}
 		}
 		else
@@ -441,6 +464,7 @@ public class ServerHandle
 				Debug.Log("Player took damage from mob btw lol");
 			}
 			ServerSend.HitPlayer(fromClient, num3, num5, num2, hitEffect, pos);
+			Server.clients[fromClient].player.stats["DamageTaken"] += num3;
 		}
 	}
 
@@ -481,7 +505,6 @@ public class ServerHandle
 		{
 			return;
 		}
-		Debug.LogError("contains shrine");
 		Interactable componentInChildren = ResourceManager.Instance.list[key].GetComponentInChildren<Interactable>();
 		if (!componentInChildren.IsStarted())
 		{
@@ -548,6 +571,10 @@ public class ServerHandle
 		int num5 = GameManager.instance.CalculateDamage(num2, defense, sharpness, sharpDefense);
 		Debug.Log($"Mob took {num5} damage from {fromClient}.");
 		int num6 = component.hp - num5;
+		if (num6 > component.maxHp)
+		{
+			num6 = component.maxHp;
+		}
 		if (num6 <= 0)
 		{
 			num6 = 0;
@@ -563,6 +590,7 @@ public class ServerHandle
 			{
 				LootExtra.BossLoot(component.transform, mob.bossType);
 			}
+			Server.clients[fromClient].player.stats["Kills"]++;
 		}
 		component.hp = component.Damage(num6, fromClient, num3, pos);
 		float knockbackMultiplier = PowerupInventory.Instance.GetKnockbackMultiplier(Server.clients[fromClient].player.powerups);
@@ -585,8 +613,8 @@ public class ServerHandle
 		if (weaponHitType != PlayerStatus.WeaponHitType.Rock && weaponHitType != PlayerStatus.WeaponHitType.Undefined && num2 > 0)
 		{
 			GameManager.instance.onlyRock = false;
-			Debug.LogError("hit: " + component.gameObject.name + ", type: " + num4 + ", type: " + weaponHitType);
 		}
+		Server.clients[fromClient].player.stats["DamageDone"] += num5;
 	}
 
 	public static void ReceiveChatMessage(int fromClient, Packet packet)

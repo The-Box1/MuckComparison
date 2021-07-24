@@ -79,29 +79,19 @@ public class HitableResource : Hitable
 
 	private void OnEnable()
 	{
-		if (!dontScale)
-		{
-			base.transform.localScale = Vector3.zero;
-		}
+		desiredScale = base.transform.localScale;
+		currentScale = base.transform.localScale;
 	}
 
 	private new void Awake()
 	{
 		base.Awake();
-		if (!dontScale)
-		{
-			if (defaultScale == Vector3.zero)
-			{
-				defaultScale = base.transform.localScale;
-			}
-			desiredScale = defaultScale;
-			base.transform.localScale = Vector3.zero;
-		}
 	}
 
 	public void SetDefaultScale(Vector3 scale)
 	{
 		defaultScale = scale;
+		desiredScale = scale;
 	}
 
 	protected override void ExecuteHit()
@@ -112,13 +102,11 @@ public class HitableResource : Hitable
 
 	public void PopIn()
 	{
-		base.transform.localScale = Vector3.zero;
-		desiredScale = defaultScale;
 	}
 
 	private void Update()
 	{
-		if (!dontScale && (!(Mathf.Abs(base.transform.localScale.x - desiredScale.x) < 0.002f) || !(Mathf.Abs(desiredScale.x - currentScale.x) < 0.002f)))
+		if (!(Mathf.Abs(base.transform.localScale.x - desiredScale.x) < 0.002f) || !(Mathf.Abs(desiredScale.x - currentScale.x) < 0.002f))
 		{
 			currentScale = Vector3.Lerp(currentScale, desiredScale, Time.deltaTime * 10f);
 			base.transform.localScale = Vector3.Lerp(base.transform.localScale, currentScale, Time.deltaTime * 15f);

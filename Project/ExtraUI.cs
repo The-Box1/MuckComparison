@@ -67,6 +67,20 @@ public class ExtraUI : MonoBehaviour
 				UpdatePlayerHp(value.id);
 			}
 		}
+		List<int> list = new List<int>();
+		foreach (int key in IdToHpBar.Keys)
+		{
+			if (!GameManager.players.ContainsKey(key))
+			{
+				list.Add(key);
+			}
+		}
+		foreach (int item in list)
+		{
+			GameObject obj = IdToHpBar[item].transform.parent.parent.parent.gameObject;
+			IdToHpBar.Remove(item);
+			Object.Destroy(obj.gameObject);
+		}
 	}
 
 	public void UpdateDay(int day)

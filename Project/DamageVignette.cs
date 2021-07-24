@@ -17,7 +17,7 @@ public class DamageVignette : MonoBehaviour
 		if ((bool)PlayerStatus.Instance)
 		{
 			float num = 0f;
-			if ((bool)MoveCamera.Instance && MoveCamera.Instance.state == MoveCamera.CameraState.Spectate)
+			if (((bool)MoveCamera.Instance && MoveCamera.Instance.state == MoveCamera.CameraState.Spectate) || MoveCamera.Instance.state == MoveCamera.CameraState.Freecam)
 			{
 				num = 0f;
 			}

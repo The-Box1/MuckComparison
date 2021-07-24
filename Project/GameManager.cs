@@ -72,7 +72,9 @@ public class GameManager : MonoBehaviour
 
 	public bool onlyRock = true;
 
-	public int playersWhenLobbyStarted;
+	public Dictionary<string, int>[] stats;
+
+	public int nStatsPlayers;
 
 	public static GameSettings gameSettings { get; set; }
 
@@ -157,16 +159,6 @@ public class GameManager : MonoBehaviour
 		LoadingScreen.Instance.FinishLoading();
 	}
 
-	private void GenerateWorld()
-	{
-		MonoBehaviour.print("generating world");
-		mapGenerator.GenerateMap(GetSeed());
-		MonoBehaviour.print("generating resources");
-		resourceGen.SetActive(value: true);
-		MonoBehaviour.print("generating navmesh");
-		generateNavmesh.GenerateNavMesh();
-	}
-
 	public void UpdateDay(int day)
 	{
 		currentDay = day;
@@ -221,12 +213,12 @@ public class GameManager : MonoBehaviour
 	{
 		float num = 0.9f;
 		float num2 = 0.26f;
-		float p = 1.6f;
+		float p = 1.55f;
 		if (gameSettings.difficulty == GameSettings.Difficulty.Easy)
 		{
 			num = 0.35f;
 			num2 = 0.2f;
-			p = 1.4f;
+			p = 1.33f;
 		}
 		else if (gameSettings.difficulty == GameSettings.Difficulty.Gamer)
 		{
@@ -252,12 +244,12 @@ public class GameManager : MonoBehaviour
 	{
 		float num = 1.05f;
 		float num2 = 0.24f;
-		float p = 1.55f;
+		float p = 1.5f;
 		if (gameSettings.difficulty == GameSettings.Difficulty.Easy)
 		{
 			num = 0.9f;
 			num2 = 0.2f;
-			p = 1.4f;
+			p = 1.32f;
 		}
 		else if (gameSettings.difficulty == GameSettings.Difficulty.Gamer)
 		{
@@ -533,6 +525,21 @@ public class GameManager : MonoBehaviour
 		ClientSend.PlayerDisconnect();
 	}
 
+	public bool KickPlayer(string username)
+	{
+		foreach (Client value in Server.clients.Values)
+		{
+			if (value != null && value.player != null && value.player.id != LocalClient.instance.myId && value.player.username.ToLower() == username.ToLower())
+			{
+				ServerHandle.KickPlayer(value.player.id);
+				SteamNetworking.CloseP2PSessionWithUser(value.player.steamId.Value);
+				Debug.Log("Kicking player: " + value.player.username + " with id " + value.player.id);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void SendPlayersIntoGame(List<Vector3> spawnPositions)
 	{
 		this.spawnPositions = spawnPositions;
@@ -555,6 +562,22 @@ public class GameManager : MonoBehaviour
 					ServerSend.SpawnPlayer(value.id, value2.player, spawnPositions[num] + Vector3.up);
 					num++;
 				}
+			}
+		}
+	}
+
+	public void MakeStats(Packet packet)
+	{
+		stats = new Dictionary<string, int>[NetworkController.maxPlayers];
+		int num = (nStatsPlayers = packet.ReadInt());
+		for (int i = 0; i < num; i++)
+		{
+			stats[i] = new Dictionary<string, int>();
+			stats[i].Add("Id", packet.ReadInt());
+			string[] allStats = Player.allStats;
+			foreach (string key in allStats)
+			{
+				stats[i].Add(key, packet.ReadInt());
 			}
 		}
 	}

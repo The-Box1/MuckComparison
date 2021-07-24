@@ -11,7 +11,10 @@ public class ShakeOnEnable : MonoBehaviour
 
 	private void OnEnable()
 	{
-		sfx.Play();
+		if ((bool)sfx)
+		{
+			sfx.Play();
+		}
 		CameraShaker.Instance.ShakeWithPreset(preset);
 		if ((bool)hitbox)
 		{

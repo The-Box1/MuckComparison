@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MoveCamera : MonoBehaviour
@@ -6,7 +7,8 @@ public class MoveCamera : MonoBehaviour
 	{
 		Player,
 		PlayerDeath,
-		Spectate
+		Spectate,
+		Freecam
 	}
 
 	public Transform player;
@@ -41,6 +43,12 @@ public class MoveCamera : MonoBehaviour
 
 	private int spectatingId;
 
+	private float yRotation;
+
+	private float desiredX;
+
+	public Vector3 cameraRot;
+
 	private Vector3 desiredBob;
 
 	private Vector3 bobOffset;
@@ -65,22 +73,24 @@ public class MoveCamera : MonoBehaviour
 		cam = base.transform.GetChild(0).GetComponent<Camera>();
 		rb = PlayerMovement.Instance.GetRb();
 		UpdateFov(CurrentSettings.Instance.fov);
-		Debug.LogError("updating fov: " + CurrentSettings.Instance.fov);
 	}
 
 	private void LateUpdate()
 	{
-		if (state == CameraState.Player)
+		switch (state)
 		{
+		case CameraState.Player:
 			PlayerCamera();
-		}
-		else if (state == CameraState.PlayerDeath)
-		{
+			break;
+		case CameraState.PlayerDeath:
 			PlayerDeathCamera();
-		}
-		else if (state == CameraState.Spectate)
-		{
+			break;
+		case CameraState.Spectate:
 			SpectateCamera();
+			break;
+		case CameraState.Freecam:
+			FreeCam();
+			break;
 		}
 	}
 
@@ -115,7 +125,23 @@ public class MoveCamera : MonoBehaviour
 
 	private void SpectateCamera()
 	{
-		if (!target)
+		if (TryStartFreecam())
+		{
+			state = CameraState.Freecam;
+			desiredX = base.transform.rotation.x;
+			yRotation = base.transform.rotation.y;
+			target = null;
+			return;
+		}
+		if (Input.GetKeyDown(InputManager.rightClick))
+		{
+			SpectateToggle(1);
+		}
+		else if (Input.GetKeyDown(InputManager.leftClick))
+		{
+			SpectateToggle(-1);
+		}
+		if (!target || !playerTarget)
 		{
 			foreach (PlayerManager value2 in GameManager.players.Values)
 			{
@@ -136,14 +162,6 @@ public class MoveCamera : MonoBehaviour
 		}
 		Vector2 vector = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 		desiredSpectateRotation += new Vector3(0f - vector.y, vector.x, 0f) * 1.5f;
-		if (Input.GetKeyDown(InputManager.rightClick))
-		{
-			SpectateToggle(1);
-		}
-		else if (Input.GetKeyDown(InputManager.leftClick))
-		{
-			SpectateToggle(-1);
-		}
 		target.position = playerTarget.position;
 		target.rotation = Quaternion.Lerp(target.rotation, Quaternion.Euler(desiredSpectateRotation), Time.deltaTime * 10f);
 		Vector3 direction = base.transform.position - target.position;
@@ -161,9 +179,95 @@ public class MoveCamera : MonoBehaviour
 		base.transform.localPosition = new Vector3(0f, 0f, -10f + value);
 	}
 
+	private void FreeCam()
+	{
+		if (TryStartLockedCam())
+		{
+			state = CameraState.Spectate;
+			return;
+		}
+		FreeCamRotation();
+		bool key = Input.GetKey(InputManager.forward);
+		bool key2 = Input.GetKey(InputManager.backwards);
+		bool key3 = Input.GetKey(InputManager.right);
+		bool key4 = Input.GetKey(InputManager.left);
+		bool key5 = Input.GetKey(InputManager.sprint);
+		bool key6 = Input.GetKey(InputManager.jump);
+		float num = 0f;
+		float num2 = 0f;
+		float num3 = 1f;
+		float num4 = 0f;
+		if (key)
+		{
+			num = 1f;
+		}
+		else if (key2)
+		{
+			num = -1f;
+		}
+		if (key3)
+		{
+			num2 = 0.5f;
+		}
+		else if (key4)
+		{
+			num2 = -0.5f;
+		}
+		if (key5)
+		{
+			num3 = 4f;
+		}
+		if (key6)
+		{
+			num4 = 1f;
+		}
+		Vector3 vector = (base.transform.forward * num + base.transform.right * num2) * num3 + Vector3.up * num4;
+		float num5 = 15f;
+		base.transform.position += vector * Time.deltaTime * num5;
+	}
+
+	private void FreeCamRotation()
+	{
+		float num = playerInput.GetMouseX();
+		float num2 = Input.GetAxis("Mouse Y") * playerInput.sensitivity * 0.02f * PlayerInput.sensMultiplier;
+		if (CurrentSettings.invertedHor)
+		{
+			num = 0f - num;
+		}
+		if (CurrentSettings.invertedVer)
+		{
+			num2 = 0f - num2;
+		}
+		Debug.LogError("mouseX: " + num + ", mouseY: " + num2);
+		desiredX += num;
+		yRotation -= num2;
+		yRotation = Mathf.Clamp(yRotation, -90f, 90f);
+		cameraRot = new Vector3(yRotation, desiredX, 0f);
+		base.transform.rotation = Quaternion.Euler(cameraRot);
+	}
+
+	private bool TryStartFreecam()
+	{
+		if (!Input.GetKey(InputManager.left) && !Input.GetKey(InputManager.right) && !Input.GetKey(InputManager.forward) && !Input.GetKey(InputManager.backwards))
+		{
+			return Input.GetKey(InputManager.jump);
+		}
+		return true;
+	}
+
+	private bool TryStartLockedCam()
+	{
+		if (!Input.GetKey(InputManager.rightClick))
+		{
+			return Input.GetKey(InputManager.leftClick);
+		}
+		return true;
+	}
+
 	private void SpectateToggle(int dir)
 	{
 		int num = spectatingId;
+		List<int> list = new List<int>();
 		for (int i = 0; i < GameManager.players.Count; i++)
 		{
 			if (!GameManager.players.ContainsKey(i) || GameManager.players[i] == null)
@@ -175,17 +279,29 @@ public class MoveCamera : MonoBehaviour
 			{
 				if (dir > 0 && playerManager.id > num)
 				{
-					spectatingId = playerManager.id;
-					playerTarget = playerManager.transform;
-					break;
+					list.Add(i);
 				}
 				if (dir < 0 && playerManager.id < num)
 				{
-					spectatingId = playerManager.id;
-					playerTarget = playerManager.transform;
-					break;
+					list.Add(i);
 				}
 			}
+		}
+		if (list.Count >= 1)
+		{
+			list.Sort();
+			PlayerManager playerManager2 = GameManager.players[list[0]];
+			if (dir > 0)
+			{
+				playerManager2 = GameManager.players[list[0]];
+			}
+			if (dir < 0)
+			{
+				playerManager2 = GameManager.players[list[list.Count - 1]];
+			}
+			spectatingId = playerManager2.id;
+			playerTarget = playerManager2.transform;
+			Debug.LogError("nextId: " + spectatingId);
 		}
 	}
 
@@ -205,9 +321,9 @@ public class MoveCamera : MonoBehaviour
 		base.transform.position = player.transform.position + bobOffset + desyncOffset + vaultOffset + offset;
 		if (!cinematic)
 		{
-			Vector3 cameraRot = playerInput.cameraRot;
-			cameraRot.x = Mathf.Clamp(cameraRot.x, -90f, 90f);
-			base.transform.rotation = Quaternion.Euler(cameraRot);
+			Vector3 euler = playerInput.cameraRot;
+			euler.x = Mathf.Clamp(euler.x, -90f, 90f);
+			base.transform.rotation = Quaternion.Euler(euler);
 			desyncOffset = Vector3.Lerp(desyncOffset, Vector3.zero, Time.deltaTime * 15f);
 			vaultOffset = Vector3.Slerp(vaultOffset, Vector3.zero, Time.deltaTime * 7f);
 			if (PlayerMovement.Instance.IsCrouching())

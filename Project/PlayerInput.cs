@@ -4,21 +4,9 @@ public class PlayerInput : MonoBehaviour
 {
 	private float xRotation;
 
-	private float sensitivity = 50f;
-
 	public static float sensMultiplier = 1f;
 
 	private float desiredX;
-
-	private float x;
-
-	private float y;
-
-	private bool jumping;
-
-	private bool crouching;
-
-	private bool sprinting;
 
 	private float mouseScroll;
 
@@ -39,6 +27,19 @@ public class PlayerInput : MonoBehaviour
 	private float wallRunRotation;
 
 	public float mouseOffsetY;
+
+	public float sensitivity { get; set; } = 50f;
+
+
+	public float x { get; private set; }
+
+	public float y { get; private set; }
+
+	public bool jumping { get; private set; }
+
+	public bool crouching { get; private set; }
+
+	public bool sprinting { get; private set; }
 
 	public static PlayerInput Instance { get; set; }
 
@@ -94,19 +95,19 @@ public class PlayerInput : MonoBehaviour
 			y = 0f;
 			if (Input.GetKey(InputManager.forward))
 			{
-				y += 1f;
+				y++;
 			}
 			else if (Input.GetKey(InputManager.backwards))
 			{
-				y -= 1f;
+				y--;
 			}
 			if (Input.GetKey(InputManager.left))
 			{
-				x -= 1f;
+				x--;
 			}
 			if (Input.GetKey(InputManager.right))
 			{
-				x += 1f;
+				x++;
 			}
 			jumping = Input.GetKey(InputManager.jump);
 			sprinting = Input.GetKey(InputManager.sprint);

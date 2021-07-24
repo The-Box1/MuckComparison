@@ -96,7 +96,7 @@ public class InventoryItem : ScriptableObject
 
 	public float attackSpeed = 1f;
 
-	public Vector3 attackRange = Vector3.one;
+	public float attackRange;
 
 	public float sharpness;
 

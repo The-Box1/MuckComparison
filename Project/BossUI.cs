@@ -42,7 +42,6 @@ public class BossUI : MonoBehaviour
 				bossName.text += "Buff ";
 			}
 			bossName.text += b.GetComponent<Hitable>().entityName;
-			Debug.LogError("hitavle entity name: " + b.GetComponent<Hitable>().entityName);
 			currentHp = 0f;
 			desiredScale = Vector3.one;
 			hitableMob = b.GetComponent<HitableMob>();

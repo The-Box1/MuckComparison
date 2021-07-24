@@ -29,7 +29,6 @@ public class ShrineBoss : MonoBehaviour, SharedObject, Interactable
 	public void AllExecute()
 	{
 		started = true;
-		Debug.LogError("Spawning");
 		Object.Instantiate(destroyShrineFx, base.transform.position, destroyShrineFx.transform.rotation);
 		Invoke("RemoveFromResources", 1.33f);
 	}

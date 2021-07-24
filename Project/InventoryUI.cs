@@ -247,7 +247,10 @@ public class InventoryUI : MonoBehaviour
 		inventoryItem.Copy(item, item.amount);
 		InventoryCell inventoryCell = null;
 		UiSfx.Instance.PlayPickup();
-		AchievementManager.Instance.PickupItem(item);
+		if ((bool)AchievementManager.Instance)
+		{
+			AchievementManager.Instance.PickupItem(item);
+		}
 		foreach (InventoryCell cell in cells)
 		{
 			if (cell.currentItem == null)
@@ -384,6 +387,26 @@ public class InventoryUI : MonoBehaviour
 		UiEvents.Instance.CheckNewUnlocks(item.id);
 		UpdateMouseSprite();
 		AchievementManager.Instance.ItemCrafted(currentMouseItem, item.craftAmount);
+	}
+
+	public void RemoveItem(InventoryItem requirement)
+	{
+		int num = 0;
+		foreach (InventoryCell cell in cells)
+		{
+			if (!(cell.currentItem == null) && cell.currentItem.Compare(requirement))
+			{
+				if (cell.currentItem.amount > requirement.amount)
+				{
+					int num2 = requirement.amount - num;
+					cell.currentItem.amount -= num2;
+					cell.UpdateCell();
+					break;
+				}
+				num += cell.currentItem.amount;
+				cell.RemoveItem();
+			}
+		}
 	}
 
 	public bool CanRepair(InventoryItem[] requirements)

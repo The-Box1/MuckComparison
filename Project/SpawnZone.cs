@@ -6,7 +6,7 @@ public abstract class SpawnZone : MonoBehaviour, SharedObject
 {
 	public int id;
 
-	protected List<GameObject> entities;
+	public List<GameObject> entities;
 
 	protected int entityBuffer;
 
@@ -48,7 +48,10 @@ public abstract class SpawnZone : MonoBehaviour, SharedObject
 		entities.RemoveAll((GameObject item) => item == null);
 		if (entities.Count + entityBuffer < entityCap)
 		{
-			Invoke("QueueEntity", respawnTime);
+			if (respawnTime >= 0f)
+			{
+				Invoke("QueueEntity", respawnTime);
+			}
 			entityBuffer++;
 		}
 		bool flag = false;

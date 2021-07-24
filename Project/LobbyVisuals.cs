@@ -20,12 +20,15 @@ public class LobbyVisuals : MonoBehaviour
 
 	public static LobbyVisuals Instance;
 
+	public OnlyActivateForHost[] lobbyPlayerNames;
+
 	private void Awake()
 	{
 		Instance = this;
 		for (int i = 0; i < lobbyPlayers.Length; i++)
 		{
 			lobbyPlayers[i].SetActive(value: false);
+			lobbyPlayerNames[i].gameObject.SetActive(value: false);
 			playerNames[i].text = "";
 		}
 	}
@@ -44,8 +47,9 @@ public class LobbyVisuals : MonoBehaviour
 	{
 		for (int i = 0; i < lobbyPlayers.Length; i++)
 		{
-			lobbyPlayers[i].SetActive(value: false);
+			lobbyPlayerNames[i].gameObject.SetActive(value: false);
 			playerNames[i].text = "";
+			lobbyPlayers[i].SetActive(value: false);
 		}
 		menuUi.LeaveLobby();
 	}
@@ -78,6 +82,11 @@ public class LobbyVisuals : MonoBehaviour
 			SpawnLobbyPlayer(new Friend(steamId));
 		}
 		menuUi.JoinLobby();
+		OnlyActivateForHost[] array = lobbyPlayerNames;
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i].kickBtn.SetActive(SteamManager.Instance.PlayerSteamId.Value == (ulong)lobby.Owner.Id);
+		}
 	}
 
 	public void SpawnLobbyPlayer(Friend friend)
@@ -89,6 +98,8 @@ public class LobbyVisuals : MonoBehaviour
 		lobbyPlayers[nextId].SetActive(value: true);
 		lobbyPlayers[nextId].GetComponentInChildren<TextMeshProUGUI>().text = text;
 		playerNames[nextId].text = friend.Name;
+		lobbyPlayerNames[nextId].gameObject.SetActive(value: true);
+		lobbyPlayerNames[nextId].steamId = friend.Id.Value;
 	}
 
 	public void DespawnLobbyPlayer(Friend friend)
@@ -98,6 +109,7 @@ public class LobbyVisuals : MonoBehaviour
 		playerNames[num].text = "";
 		steamToLobbyId.Remove(friend.Id.Value);
 		playerNames[num].text = "";
+		lobbyPlayerNames[num].gameObject.SetActive(value: false);
 	}
 
 	private int GetNextId()

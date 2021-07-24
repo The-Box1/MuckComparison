@@ -98,7 +98,7 @@ public class OtherInput : MonoBehaviour
 		{
 			return true;
 		}
-		if (RespawnTotemUI.Instance.root.activeInHierarchy)
+		if (RespawnTotemUI.Instance.root.activeInHierarchy || TraderUI.Instance.root.activeInHierarchy)
 		{
 			return true;
 		}
@@ -132,7 +132,7 @@ public class OtherInput : MonoBehaviour
 		}
 		else
 		{
-			if (RespawnTotemUI.Instance.root.activeInHierarchy || ChatBox.Instance.typing)
+			if (RespawnTotemUI.Instance.root.activeInHierarchy || TraderUI.Instance.root.activeInHierarchy || ChatBox.Instance.typing)
 			{
 				return;
 			}

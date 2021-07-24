@@ -18,6 +18,8 @@ public class NetworkController : MonoBehaviour
 
 	public int nPlayers;
 
+	public static int maxPlayers = 10;
+
 	public Lobby lobby;
 
 	public string[] playerNames;

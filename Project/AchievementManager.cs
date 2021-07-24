@@ -158,9 +158,18 @@ public class AchievementManager : MonoBehaviour
 				SteamUserStats.AddStat("GuardianKills", 1);
 				CheckAllBossesKilled();
 			}
+			if (text == "Chief")
+			{
+				SteamUserStats.AddStat("ChiefKills", 1);
+				CheckAllBossesKilled();
+			}
 			if (text == "Goblin")
 			{
 				SteamUserStats.AddStat("GoblinKills", 1);
+			}
+			if (text == "Woodman")
+			{
+				SteamUserStats.AddStat("WoodmanKills", 1);
 			}
 			int statInt = SteamUserStats.GetStatInt("Kills");
 			int statInt2 = SteamUserStats.GetStatInt("TotalKills");
@@ -171,7 +180,8 @@ public class AchievementManager : MonoBehaviour
 			int statInt7 = SteamUserStats.GetStatInt("GronkKills");
 			int statInt8 = SteamUserStats.GetStatInt("GuardianKills");
 			int statInt9 = SteamUserStats.GetStatInt("GoblinKills");
-			Debug.Log("Killcount: " + statInt + ", allkills: " + statInt2 + ", bowkills: " + statInt3 + ", buffkills: " + statInt4 + ", Cow Kills: " + statInt5 + ", chunks: " + statInt6 + ", gronks: " + statInt7 + ", guardians: " + statInt8 + ", goblins: " + statInt9);
+			int statInt10 = SteamUserStats.GetStatInt("WoodmanKills");
+			Debug.Log("Killcount: " + statInt + ", allkills: " + statInt2 + ", bowkills: " + statInt3 + ", buffkills: " + statInt4 + ", Cow Kills: " + statInt5 + ", chunks: " + statInt6 + ", gronks: " + statInt7 + ", guardians: " + statInt8 + ", goblins: " + statInt9 + "Woodman kills: " + statInt10);
 			SteamUserStats.StoreStats();
 		}
 	}
@@ -180,7 +190,9 @@ public class AchievementManager : MonoBehaviour
 	{
 		int statInt = SteamUserStats.GetStatInt("BigChunkKills");
 		int statInt2 = SteamUserStats.GetStatInt("GronkKills");
-		if (SteamUserStats.GetStatInt("GuardianKills") > 0 && statInt2 > 0 && statInt > 0)
+		int statInt3 = SteamUserStats.GetStatInt("GuardianKills");
+		int statInt4 = SteamUserStats.GetStatInt("ChiefKills");
+		if (statInt3 > 0 && statInt2 > 0 && statInt > 0 && statInt4 > 0)
 		{
 			SteamUserStats.AddStat("Fearless", 1);
 			Debug.Log("All bosses killed: " + SteamUserStats.GetStatInt("Fearless"));
@@ -364,20 +376,20 @@ public class AchievementManager : MonoBehaviour
 			return;
 		}
 		InventoryItem[] array = gems;
-		for (int i = 0; i < array.Length; i++)
+		foreach (InventoryItem inventoryItem in array)
 		{
-			if (array[i].id != item.id)
+			if (!(item != null) || inventoryItem.id != item.id)
 			{
 				continue;
 			}
 			Debug.Log("Found gem, testing");
 			bool flag = true;
 			InventoryItem[] array2 = gems;
-			foreach (InventoryItem inventoryItem in array2)
+			foreach (InventoryItem inventoryItem2 in array2)
 			{
-				if (inventoryItem.id != item.id && !InventoryUI.Instance.HasItem(inventoryItem))
+				if (inventoryItem2.id != item.id && !InventoryUI.Instance.HasItem(inventoryItem2))
 				{
-					Debug.Log("Couldnt find item: " + inventoryItem.name);
+					Debug.Log("Couldnt find item: " + inventoryItem2.name);
 					flag = false;
 					break;
 				}
@@ -430,6 +442,16 @@ public class AchievementManager : MonoBehaviour
 				Debug.Log("Gamer: " + SteamUserStats.GetStatInt("Gamer"));
 				break;
 			}
+			SteamUserStats.StoreStats();
+		}
+	}
+
+	public void OpenChiefChest()
+	{
+		if (CanUseAchievements())
+		{
+			SteamUserStats.AddStat("ChiefChests", 1);
+			Debug.Log("ChiefChests: " + SteamUserStats.GetStatInt("ChiefChests"));
 			SteamUserStats.StoreStats();
 		}
 	}

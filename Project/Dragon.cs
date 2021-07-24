@@ -16,7 +16,7 @@ public class Dragon : MonoBehaviour
 
 	private void Start()
 	{
-		MusicController.Instance.StopSong(0.5f);
+		MusicController.Instance.FinalBoss();
 	}
 
 	public void PlayWingFlap()

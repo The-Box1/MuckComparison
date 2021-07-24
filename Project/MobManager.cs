@@ -37,8 +37,9 @@ public class MobManager : MonoBehaviour
 		int num = 0;
 		foreach (Mob value in mobs.Values)
 		{
-			if (!value.gameObject.CompareTag("DontCount") && value.mobType.behaviour != 0)
+			if (!value.gameObject.CompareTag("DontCount") && value.mobType.behaviour != 0 && !(value.mobType.name == "Woodman"))
 			{
+				Debug.LogError("Counting enemy: " + value.gameObject.name);
 				num++;
 			}
 		}

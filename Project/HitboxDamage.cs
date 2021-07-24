@@ -43,7 +43,6 @@ public class HitboxDamage : MonoBehaviour
 			return;
 		}
 		alreadyHit.Add(other.gameObject);
-		Debug.LogError("hit: " + other.gameObject.name);
 		if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
 		{
 			if (!playerHit && other.CompareTag("Local") && (bool)PlayerMovement.Instance && !GameManager.players[LocalClient.instance.myId].dead)
@@ -61,7 +60,6 @@ public class HitboxDamage : MonoBehaviour
 			{
 				return;
 			}
-			Debug.LogError("hit2: " + other.gameObject.name);
 			Hitable componentInChildren = other.transform.root.GetComponentInChildren<Hitable>();
 			if ((bool)componentInChildren)
 			{

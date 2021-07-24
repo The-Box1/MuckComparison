@@ -6,7 +6,8 @@ public class MusicController : MonoBehaviour
 	{
 		Day,
 		Night,
-		Boss
+		Boss,
+		Bob
 	}
 
 	public AudioClip[] day;
@@ -14,6 +15,8 @@ public class MusicController : MonoBehaviour
 	public AudioClip[] night;
 
 	public AudioClip[] boss;
+
+	public AudioClip bobTheme;
 
 	private AudioSource audio;
 
@@ -54,7 +57,7 @@ public class MusicController : MonoBehaviour
 
 	public void PlaySong(SongType s, bool chanceToSkip = true)
 	{
-		if ((bool)GameManager.instance && GameManager.instance.boatLeft)
+		if ((bool)GameManager.instance && GameManager.instance.boatLeft && s != SongType.Bob)
 		{
 			return;
 		}
@@ -77,6 +80,9 @@ public class MusicController : MonoBehaviour
 			break;
 		case SongType.Boss:
 			audioClip = boss[Random.Range(0, boss.Length)];
+			break;
+		case SongType.Bob:
+			audioClip = bobTheme;
 			break;
 		}
 		if (audioClip == null)
@@ -117,6 +123,21 @@ public class MusicController : MonoBehaviour
 			duration = fade;
 		}
 		StartFade(audio, duration, 0f);
+	}
+
+	public void FinalBoss()
+	{
+		float num = 0.5f;
+		queuedSong = bobTheme;
+		StartFade(audio, num, 0f);
+		Invoke("BobTheme", num);
+	}
+
+	private void BobTheme()
+	{
+		StartFade(audio, 4f, targetVolume);
+		audio.clip = queuedSong;
+		audio.Play();
 	}
 
 	private void Update()

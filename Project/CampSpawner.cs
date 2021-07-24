@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StructureSpawner : MonoBehaviour
+public class CampSpawner : MonoBehaviour
 {
 	[Serializable]
 	public class WeightedSpawn
@@ -18,9 +18,13 @@ public class StructureSpawner : MonoBehaviour
 
 	private float worldEdgeBuffer = 0.6f;
 
-	public int nShrines = 50;
+	public int maxCaves = 50;
+
+	public int minCaves = 3;
 
 	protected ConsistentRandom randomGen;
+
+	public static ConsistentRandom woodmanRandomGen;
 
 	public LayerMask whatIsTerrain;
 
@@ -28,44 +32,47 @@ public class StructureSpawner : MonoBehaviour
 
 	public bool dontAddToResourceManager;
 
+	public StructureSpawner houses;
+
 	private Vector3[] shrines;
+
+	private float totalWeight;
 
 	public float worldScale { get; set; } = 12f;
 
-
-	public float totalWeight { get; set; }
-
-	public void CalculateWeight()
-	{
-		totalWeight = 0f;
-		WeightedSpawn[] array = structurePrefabs;
-		foreach (WeightedSpawn weightedSpawn in array)
-		{
-			totalWeight += weightedSpawn.weight;
-		}
-	}
 
 	private void Start()
 	{
 		structures = new List<GameObject>();
 		randomGen = new ConsistentRandom(GameManager.GetSeed() + ResourceManager.GetNextGenOffset());
-		shrines = new Vector3[nShrines];
+		woodmanRandomGen = new ConsistentRandom(GameManager.GetSeed() + ResourceManager.GetNextGenOffset());
+		shrines = new Vector3[maxCaves];
 		mapChunkSize = MapGenerator.mapChunkSize;
 		worldScale *= worldEdgeBuffer;
-		CalculateWeight();
-		int num = 0;
-		for (int i = 0; i < nShrines; i++)
+		WeightedSpawn[] array = structurePrefabs;
+		foreach (WeightedSpawn weightedSpawn in array)
 		{
+			totalWeight += weightedSpawn.weight;
+		}
+		int num = 0;
+		int num2 = 0;
+		while (num < maxCaves)
+		{
+			num2++;
 			float x = (float)(randomGen.NextDouble() * 2.0 - 1.0) * (float)mapChunkSize / 2f;
 			float z = (float)(randomGen.NextDouble() * 2.0 - 1.0) * (float)mapChunkSize / 2f;
 			Vector3 vector = new Vector3(x, 0f, z) * worldScale;
 			vector.y = 200f;
 			Debug.DrawLine(vector, vector + Vector3.down * 500f, Color.cyan, 50f);
-			if (Physics.Raycast(vector, Vector3.down, out var hitInfo, 500f, whatIsTerrain) && WorldUtility.WorldHeightToBiome(hitInfo.point.y) == TextureData.TerrainType.Grass)
+			if (Physics.Raycast(vector, Vector3.down, out var hitInfo, 500f, whatIsTerrain))
 			{
-				shrines[i] = hitInfo.point;
+				if (WorldUtility.WorldHeightToBiome(hitInfo.point.y) != TextureData.TerrainType.Grass || Mathf.Abs(Vector3.Angle(Vector3.up, hitInfo.normal)) > 15f)
+				{
+					continue;
+				}
+				shrines[num] = hitInfo.point;
 				num++;
-				GameObject gameObject = FindObjectToSpawn(structurePrefabs, totalWeight, randomGen);
+				GameObject gameObject = FindObjectToSpawn(structurePrefabs, totalWeight);
 				GameObject gameObject2 = UnityEngine.Object.Instantiate(gameObject, hitInfo.point, gameObject.transform.rotation);
 				if (!dontAddToResourceManager)
 				{
@@ -74,25 +81,31 @@ public class StructureSpawner : MonoBehaviour
 				structures.Add(gameObject2);
 				Process(gameObject2, hitInfo);
 			}
+			if ((num2 > maxCaves * 2 && num >= minCaves) || num2 > maxCaves * 10)
+			{
+				break;
+			}
 		}
 		if (!dontAddToResourceManager)
 		{
 			ResourceManager.Instance.AddResources(structures);
 		}
-		MonoBehaviour.print("spawned: " + structures.Count);
 	}
 
 	public virtual void Process(GameObject newStructure, RaycastHit hit)
 	{
+		GenerateCamp component = newStructure.GetComponent<GenerateCamp>();
+		component.houseSpawner = houses;
+		component.MakeCamp(randomGen);
 	}
 
 	private void OnDrawGizmos()
 	{
 	}
 
-	public GameObject FindObjectToSpawn(WeightedSpawn[] structurePrefabs, float totalWeight, ConsistentRandom rand)
+	public GameObject FindObjectToSpawn(WeightedSpawn[] structurePrefabs, float totalWeight)
 	{
-		float num = (float)rand.NextDouble();
+		float num = (float)randomGen.NextDouble();
 		float num2 = 0f;
 		for (int i = 0; i < structurePrefabs.Length; i++)
 		{

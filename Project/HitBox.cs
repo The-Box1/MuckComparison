@@ -24,14 +24,14 @@ public class HitBox : MonoBehaviour
 		{
 			return;
 		}
-		float maxDistance = 1.2f + PlayerStatus.Instance.currentChunkArmorMultiplier;
+		InventoryItem currentItem = Hotbar.Instance.currentItem;
+		float maxDistance = 1.2f + currentItem.attackRange + PlayerStatus.Instance.currentChunkArmorMultiplier;
 		RaycastHit[] array = Physics.SphereCastAll(playerCam.position + playerCam.forward * 0.1f, 3f, playerCam.forward, maxDistance, whatIsHittable);
 		Array.Sort(array, (RaycastHit x, RaycastHit y) => x.distance.CompareTo(y.distance));
 		if (array.Length < 1)
 		{
 			return;
 		}
-		InventoryItem currentItem = Hotbar.Instance.currentItem;
 		bool falling = !PlayerMovement.Instance.grounded && PlayerMovement.Instance.GetVelocity().y < 0f;
 		PowerupCalculations.DamageResult damageMultiplier = PowerupCalculations.Instance.GetDamageMultiplier(falling);
 		float damageMultiplier2 = damageMultiplier.damageMultiplier;

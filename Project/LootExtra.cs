@@ -70,6 +70,10 @@ public class LootExtra : MonoBehaviour
 			pos += Vector3.up * (item.mesh.bounds.extents.y * 2f);
 			ItemManager.Instance.DropItemAtPosition(id, item.amount, pos, nextId);
 			ServerSend.DropItemAtPosition(id, item.amount, nextId, pos);
+			if (item.name == "Coin")
+			{
+				Server.clients[fromClient].player.stats["Gold collected"] += item.amount;
+			}
 		}
 	}
 

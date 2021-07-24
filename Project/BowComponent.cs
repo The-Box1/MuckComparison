@@ -12,4 +12,6 @@ public class BowComponent : ScriptableObject
 	public float timeToImpact = 1.2f;
 
 	public float attackSize = 10f;
+
+	public float colliderDisabledTime = 0.1f;
 }

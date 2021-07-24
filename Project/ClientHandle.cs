@@ -353,15 +353,28 @@ public class ClientHandle : MonoBehaviour
 		packet.ReadBool();
 	}
 
+	public static void KickPlayer(Packet packet)
+	{
+		SteamManager.Instance.leaveLobby();
+		if ((bool)GameManager.instance)
+		{
+			GameManager.instance.LeaveGame();
+		}
+	}
+
 	public static void DisconnectPlayer(Packet packet)
 	{
 		int num = packet.ReadInt();
 		Debug.Log($"Player {num} has disconnected");
 		if (num == LocalClient.instance.myId)
 		{
-			GameManager.instance.LeaveGame();
+			SteamManager.Instance.leaveLobby();
+			if ((bool)GameManager.instance)
+			{
+				GameManager.instance.LeaveGame();
+			}
 		}
-		else
+		else if ((bool)GameManager.instance)
 		{
 			GameManager.instance.DisconnectPlayer(num);
 		}
@@ -581,10 +594,9 @@ public class ClientHandle : MonoBehaviour
 
 	public static void ShipUpdate(Packet packet)
 	{
-		Boat.BoatPackets boatPackets = (Boat.BoatPackets)packet.ReadInt();
-		Debug.LogError("client received ship update: " + boatPackets);
+		Boat.BoatPackets p = (Boat.BoatPackets)packet.ReadInt();
 		int interactId = packet.ReadInt();
-		Boat.Instance.UpdateShipStatus(boatPackets, interactId);
+		Boat.Instance.UpdateShipStatus(p, interactId);
 	}
 
 	public static void DragonUpdate(Packet packet)
@@ -594,5 +606,10 @@ public class ClientHandle : MonoBehaviour
 		{
 			Dragon.Instance.transform.root.GetComponent<BobMob>().DragonUpdate(state);
 		}
+	}
+
+	public static void ReceiveStats(Packet packet)
+	{
+		GameManager.instance.MakeStats(packet);
 	}
 }

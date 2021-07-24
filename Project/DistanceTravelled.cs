@@ -24,7 +24,10 @@ public class DistanceTravelled : MonoBehaviour
 	{
 		int groundDist = (int)groundTravelled;
 		int waterDist = (int)waterTravelled;
-		AchievementManager.Instance.MoveDistance(groundDist, waterDist);
+		if ((bool)AchievementManager.Instance)
+		{
+			AchievementManager.Instance.MoveDistance(groundDist, waterDist);
+		}
 		groundTravelled = 0f;
 		waterTravelled = 0f;
 	}

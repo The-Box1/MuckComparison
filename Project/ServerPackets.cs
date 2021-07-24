@@ -5,6 +5,7 @@ public enum ServerPackets
 	playerPosition,
 	playerRotation,
 	playerDisconnect,
+	playerKick,
 	playerDied,
 	pingPlayer,
 	connectionSuccessful,
@@ -55,5 +56,6 @@ public enum ServerPackets
 	interact,
 	setTarget,
 	shipUpdate,
-	dragonUpdate
+	dragonUpdate,
+	sendStats
 }

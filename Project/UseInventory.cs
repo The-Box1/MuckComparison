@@ -85,10 +85,12 @@ public class UseInventory : MonoBehaviour
 		renderTransform.localPosition = item.positionOffset;
 		meshRenderer.material = item.material;
 		meshFilter.mesh = item.mesh;
-		hitBox.transform.parent.localScale = item.attackRange;
 		animator.SetFloat("AttackSpeed", currentItem.attackSpeed);
 		animator.Play("Equip", -1, 0f);
-		AchievementManager.Instance.WieldedWeapon(item);
+		if ((bool)AchievementManager.Instance)
+		{
+			AchievementManager.Instance.WieldedWeapon(item);
+		}
 	}
 
 	private void StopUse()

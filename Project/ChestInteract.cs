@@ -36,6 +36,11 @@ public class ChestInteract : MonoBehaviour, Interactable
 
 	public void ServerExecute(int fromClient)
 	{
+		WhenOpened();
+	}
+
+	protected virtual void WhenOpened()
+	{
 	}
 
 	public void RemoveObject()

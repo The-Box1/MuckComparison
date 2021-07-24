@@ -291,35 +291,35 @@ public class LocalClient : MonoBehaviour
 				ClientHandle.PlayerRotation
 			},
 			{
-				7,
+				8,
 				ClientHandle.ReceivePing
 			},
 			{
-				10,
+				11,
 				ClientHandle.ReceiveStatus
 			},
 			{
-				13,
+				14,
 				ClientHandle.Clock
 			},
 			{
-				50,
+				51,
 				ClientHandle.PlayerFinishedLoading
 			},
 			{
-				8,
+				9,
 				ClientHandle.ConnectionEstablished
 			},
 			{
-				11,
+				12,
 				ClientHandle.GameOver
 			},
 			{
-				55,
+				56,
 				ClientHandle.ShipUpdate
 			},
 			{
-				56,
+				57,
 				ClientHandle.DragonUpdate
 			},
 			{
@@ -328,167 +328,175 @@ public class LocalClient : MonoBehaviour
 			},
 			{
 				6,
+				ClientHandle.KickPlayer
+			},
+			{
+				7,
 				ClientHandle.PlayerDied
 			},
 			{
-				52,
+				53,
 				ClientHandle.SpawnGrave
 			},
 			{
-				15,
+				16,
 				ClientHandle.Ready
 			},
 			{
-				12,
+				13,
 				ClientHandle.StartGame
 			},
 			{
-				14,
+				15,
 				ClientHandle.OpenDoor
 			},
 			{
-				17,
+				18,
 				ClientHandle.DropItem
 			},
 			{
-				21,
+				22,
 				ClientHandle.DropResources
 			},
 			{
-				18,
+				19,
 				ClientHandle.PickupItem
 			},
 			{
-				49,
+				50,
 				ClientHandle.SpawnEffect
 			},
 			{
-				19,
+				20,
 				ClientHandle.WeaponInHand
 			},
 			{
-				20,
+				21,
 				ClientHandle.PlayerHitObject
 			},
 			{
-				45,
+				46,
 				ClientHandle.RemoveResource
 			},
 			{
-				42,
+				43,
 				ClientHandle.PlayerHp
 			},
 			{
-				43,
+				44,
 				ClientHandle.RespawnPlayer
 			},
 			{
-				28,
+				29,
 				ClientHandle.PlayerHit
 			},
 			{
-				22,
+				23,
 				ClientHandle.AnimationUpdate
 			},
 			{
-				44,
+				45,
 				ClientHandle.ShootArrowFromPlayer
 			},
 			{
-				23,
+				24,
 				ClientHandle.FinalizeBuild
 			},
 			{
-				24,
+				25,
 				ClientHandle.OpenChest
 			},
 			{
-				25,
+				26,
 				ClientHandle.UpdateChest
 			},
 			{
-				26,
+				27,
 				ClientHandle.PickupInteract
 			},
 			{
-				27,
+				28,
 				ClientHandle.DropItemAtPosition
 			},
 			{
-				35,
+				36,
 				ClientHandle.DropPowerupAtPosition
 			},
 			{
-				29,
+				30,
 				ClientHandle.MobSpawn
 			},
 			{
-				30,
+				31,
 				ClientHandle.MobMove
 			},
 			{
-				31,
+				32,
 				ClientHandle.MobSetDestination
 			},
 			{
-				54,
+				55,
 				ClientHandle.MobSetTarget
 			},
 			{
-				32,
+				33,
 				ClientHandle.MobAttack
 			},
 			{
-				46,
+				47,
 				ClientHandle.MobSpawnProjectile
 			},
 			{
-				33,
+				34,
 				ClientHandle.PlayerDamageMob
 			},
 			{
-				48,
+				49,
 				ClientHandle.KnockbackMob
 			},
 			{
-				53,
+				54,
 				ClientHandle.Interact
 			},
 			{
-				34,
+				35,
 				ClientHandle.ShrineCombatStart
 			},
 			{
-				51,
+				52,
 				ClientHandle.RevivePlayer
 			},
 			{
-				37,
+				38,
 				ClientHandle.MobZoneToggle
 			},
 			{
-				36,
+				37,
 				ClientHandle.MobZoneSpawn
 			},
 			{
-				38,
+				39,
 				ClientHandle.PickupSpawnZone
 			},
 			{
-				39,
+				40,
 				ClientHandle.ReceiveChatMessage
 			},
 			{
-				40,
+				41,
 				ClientHandle.ReceivePlayerPing
 			},
 			{
-				41,
+				42,
 				ClientHandle.ReceivePlayerArmor
 			},
 			{
-				47,
+				48,
 				ClientHandle.NewDay
+			},
+			{
+				58,
+				ClientHandle.ReceiveStats
 			}
 		};
 		Debug.Log("Initializing packets.");

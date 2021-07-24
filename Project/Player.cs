@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Steamworks;
 using UnityEngine;
 
@@ -25,13 +26,7 @@ public class Player
 
 	public bool dead;
 
-	public int ping;
-
-	public ulong damageDone;
-
-	public ulong mobsKilled;
-
-	public ulong damageTaken;
+	public Dictionary<string, int> stats;
 
 	public float lastPingTime;
 
@@ -42,6 +37,8 @@ public class Player
 	public int totalArmor;
 
 	public SteamId steamId;
+
+	public static string[] allStats = new string[9] { "Kills", "Deaths", "Revives", "DamageDone", "DamageTaken", "Day", "Powerups", "Chests", "Gold collected" };
 
 	public int currentHp;
 
@@ -57,6 +54,7 @@ public class Player
 		{
 			armor[i] = -1;
 		}
+		InitStats();
 	}
 
 	public Player(int id, string username, Color color, SteamId steamId)
@@ -71,6 +69,17 @@ public class Player
 		for (int i = 0; i < armor.Length; i++)
 		{
 			armor[i] = -1;
+		}
+		InitStats();
+	}
+
+	private void InitStats()
+	{
+		stats = new Dictionary<string, int>();
+		string[] array = allStats;
+		foreach (string key in array)
+		{
+			stats.Add(key, 0);
 		}
 	}
 

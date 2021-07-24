@@ -266,6 +266,10 @@ public class Tutorial : MonoBehaviour
 		GameObject gameObject = null;
 		foreach (GameObject value in ResourceManager.Instance.list.Values)
 		{
+			if (value == null)
+			{
+				continue;
+			}
 			HitableTree component = value.GetComponent<HitableTree>();
 			if (component != null && component.entityName == "Tree")
 			{

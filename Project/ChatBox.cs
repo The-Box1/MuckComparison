@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -33,6 +34,8 @@ public class ChatBox : MonoBehaviour
 
 	private List<string> profanity;
 
+	public string[] commands = new string[5] { "seed", "ping", "debug", "kill", "kick" };
+
 	public bool typing { get; set; }
 
 	private void Awake()
@@ -64,7 +67,7 @@ public class ChatBox : MonoBehaviour
 			text3 = ((fromUser == LocalClient.instance.myId) ? (text3 + "#" + ColorUtility.ToHtmlStringRGB(localPlayer) + ">") : ((!GameManager.players[fromUser].dead) ? (text3 + "#" + ColorUtility.ToHtmlStringRGB(onlinePlayer) + ">") : (text3 + "#" + ColorUtility.ToHtmlStringRGB(deadPlayer) + ">")));
 			text2 += text3;
 		}
-		if (GameManager.gameSettings.gameMode != GameSettings.GameMode.Versus || !GameManager.players[fromUser].dead || PlayerStatus.Instance.IsPlayerDead())
+		if (GameManager.gameSettings.gameMode != GameSettings.GameMode.Versus || fromUser == -1 || !GameManager.players[fromUser].dead || PlayerStatus.Instance.IsPlayerDead())
 		{
 			if (fromUser != -1 || (fromUser == -1 && fromUsername != ""))
 			{
@@ -117,10 +120,13 @@ public class ChatBox : MonoBehaviour
 
 	private void ChatCommand(string message)
 	{
-		string text = message.Substring(1);
+		if (message.Length <= 0)
+		{
+			return;
+		}
+		string text = message.Split(' ')[0].Substring(1);
 		ClearMessage();
 		string text2 = "#" + ColorUtility.ToHtmlStringRGB(console);
-		_ = text == "seed";
 		switch (text)
 		{
 		case "seed":
@@ -139,6 +145,16 @@ public class ChatBox : MonoBehaviour
 		case "kill":
 			PlayerStatus.Instance.Damage(0, 0, ignoreProtection: true);
 			break;
+		case "kick":
+		{
+			int startIndex = message.IndexOf(" ", StringComparison.Ordinal) + 1;
+			string username = message.Substring(startIndex);
+			if (!GameManager.instance.KickPlayer(username))
+			{
+				AppendMessage(0, "Failed to kick player...", GameManager.players[LocalClient.instance.myId].username);
+			}
+			break;
+		}
 		}
 	}
 

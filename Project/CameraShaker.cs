@@ -53,4 +53,14 @@ public class CameraShaker : MonoBehaviour
 			shaker.Shake(preset);
 		}
 	}
+
+	public void ShakeWithPresetAndRatio(ShakePreset preset, float shakeRatio)
+	{
+		if (CurrentSettings.cameraShake)
+		{
+			shakeRatio *= 2f;
+			shakeRatio = Mathf.Clamp(shakeRatio, 0.2f, 1f);
+			shaker.Shake(preset).StrengthScale = shakeRatio;
+		}
+	}
 }

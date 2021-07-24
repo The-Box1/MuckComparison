@@ -47,7 +47,7 @@ public class LoadingScreen : MonoBehaviour
 		players = new bool[10];
 		if (LocalClient.serverOwner)
 		{
-			InvokeRepeating("CheckAllPlayersLoading", 10f, 10f);
+			InvokeRepeating("CheckAllPlayersLoading", 5f, 5f);
 		}
 	}
 
@@ -61,14 +61,10 @@ public class LoadingScreen : MonoBehaviour
 		Debug.LogError("Checking all players");
 		foreach (Client value in Server.clients.Values)
 		{
-			if (value?.player != null)
+			if (value?.player != null && !value.player.loading)
 			{
-				Debug.LogError("Checking players");
-				if (!value.player.loading)
-				{
-					ServerSend.StartGame(value.player.id, GameManager.gameSettings);
-					Debug.LogError(value.player.username + " failed to load, trying to get him to load again...");
-				}
+				ServerSend.StartGame(value.player.id, GameManager.gameSettings);
+				Debug.LogError(value.player.username + " failed to load, trying to get him to load again...");
 			}
 		}
 	}

@@ -21,7 +21,11 @@ public class MobZone : SpawnZone
 				component.mobZoneId = id;
 			}
 			ServerSend.MobZoneSpawn(vector, entityType, nextId, id);
-			if (mobType.behaviour != 0)
+			if (mobType.name == "Woodman")
+			{
+				gameObject.GetComponent<WoodmanBehaviour>().mobZoneId = id;
+			}
+			else if (mobType.behaviour != 0)
 			{
 				gameObject.AddComponent<DontAttackUntilPlayerSpotted>().mobZoneId = id;
 			}
